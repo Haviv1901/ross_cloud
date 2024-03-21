@@ -15,7 +15,7 @@ class ClientManager:
             continue
 
     @staticmethod
-    def print_main_menu(self):
+    def print_main_menu():
         print("--- Welcome to ross cloud ! ---")
 
     def login_or_register(self):
@@ -48,10 +48,9 @@ class ClientManager:
             self.login()
 
 
-
 def main():
-    main_menu = MainMenu()
-
+    main_menu = ClientManager()
+    # TODO: FIX LOGIN AND REGISTER.
 
 
 if __name__ == "__main__":
