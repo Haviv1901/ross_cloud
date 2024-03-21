@@ -1,30 +1,46 @@
 import sqlite3
+from User import User
 
 
 class UsersDataBase:
 
-    def __init__(self):
-        self.db = Database("users.db")
-        self.db.connect()
-        self.create_table()
-
-    def create_table(self):
-        query = """CREATE TABLE IF NOT EXISTS users (
+    CREATE_TABLE_QUERY = """CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             username TEXT NOT NULL,
             password TEXT NOT NULL
         );"""
-        self.db.execute_query(query)
+
+    def __init__(self):
+        self.db = Database()
+        self.db.connect()
+        self.create_table()
+
+    def create_table(self):
+        self.db.execute_query(self.CREATE_TABLE_QUERY)
+
+    def add_user(self, user: User):
+        query = "INSERT INTO users (username, password) VALUES (?, ?);"
+        return self.db.execute_query(query, (user.username, user.password))
+
+    def get_user(self, username):
+        query = "SELECT * FROM users WHERE username = ?;"
+        user_data = self.db.fetch_query(query, (username,))
+        if user_data:
+            user_data = user_data[0]
+            return User(user_data[1], user_data[2])
+        return None
 
 
 class Database:
-    def __init__(self, db_name):
-        self.db_name = db_name
+
+    DB_NAME = "rossCloud.db"
+
+    def __init__(self):
         self.connection = None
         self.cursor = None
 
     def connect(self):
-        self.connection = sqlite3.connect(self.db_name)
+        self.connection = sqlite3.connect(self.DB_NAME)
         self.cursor = self.connection.cursor()
 
     def disconnect(self):
