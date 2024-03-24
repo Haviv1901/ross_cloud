@@ -1,0 +1,44 @@
+{% extends "base.html" %} {% block title %}Admin Page{% endblock %} {% block content
+    %}
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>User Id</th>
+                <th>Username</th>
+                <th>Password Hash</th>
+                <th>Is Admin</th>
+                <th>Files</th>
+                <th>Remove User</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.password }}</td>
+                <td>{{ user.admin }}</td>
+                <td>
+                    <form method="POST" action="/files">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit">Delete</button>
+                    </form> <!-- Added closing </form> tag -->
+                </td>
+                <td>
+                    <form method="POST" action="/delete_user">
+                        <input type="hidden" name="user_id" value="{{ user.id }}">
+                        <button type="submit">Delete</button>
+                    </form> <!-- Added closing </form> tag -->
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+
+
+
+    {% endblock %}

@@ -9,47 +9,64 @@ class ServerManager:
         # init socket and start listening on port
         self.com = CommunicatorServer()
         self.com.start_listening()
-        # init database
+        # init user database
         self.user_db = UsersDataBase()
 
-        self.start()
+        self.main()
 
-    def start(self):
-        while True:
-            msg = self.com.recv_message()
-            data_list = msg.split(',')
+    def main(self):
+        self.authenticate_user()
 
-            if (data_list[0] != "login" and data_list[0] != "register"):  # check for register
-                self.com.send_message("0")
-                continue
+    def authenticate_user(self):
+        """
+        make the login or register process.
+        :return: this function will loop forever untill user sends exit, or finishes the auth procces.
+        :rtype:
+        """
+        msg = self.com.recv_message()
+        data_list = msg.split(',')
 
-            user_trying_auth = User(data_list[1], data_list[2])
-            if data_list[0] == "login":
-                self.try_login(user_trying_auth)
-            else:
-                self.try_register(user_trying_auth)
+        if data_list[0] != "login" and data_list[0] != "register":  # check for register or login
+            self.com.send_message("0")
+            self.authenticate_user()
+
+        user_trying_auth = User(data_list[1], data_list[2])
+
+        auth_success = False
+
+        if data_list[0] == "login":
+            auth_success = self.try_login(user_trying_auth)
+        else:
+            auth_success = self.try_register(user_trying_auth)
+
+            if not auth_success:
+                self.authenticate_user()
 
     def try_login(self, user: User):
-        user_from_db = self.db.get_user(user.username)
-        if user_from_db and user_from_db.password == user.password:
-            self.com.send_message("1")
-            return True
-        else:
+        user_from_db = self.user_db.get_user(user.username)
+
+        if user_from_db is None:
             self.com.send_message("0")
             return False
+
+        if user_from_db.password == user.password:
+            self.com.send_message("1")
+            return True
+
+        self.com.send_message("0")
+        return False
 
     def try_register(self, user: User):
-        if self.db.add_user(user):
+        if self.user_db.add_user(user):
             self.com.send_message("1")
             return True
         else:
             self.com.send_message("0")
             return False
 
+
 def main():
-    com = CommunicatorServer()
-    com.start_listening()
-    # now wait for login or register
+    server_manager = ServerManager()
 
 
 

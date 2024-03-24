@@ -51,6 +51,7 @@ class Database:
         if not self.connection:
             self.connect()
         try:
+            print("trying to execute: ", query, "with params: ", params)
             if params:
                 self.cursor.execute(query, params)
             else:
