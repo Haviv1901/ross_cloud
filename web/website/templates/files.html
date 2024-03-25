@@ -1,6 +1,8 @@
 {% extends "base.html" %} {% block title %}Files{% endblock %} {% block content
     %}
 
+    <h1>Files of {{ user.username }}</h1>
+
 
     <table>
         <thead>
@@ -11,7 +13,6 @@
             </tr>
         </thead>
         <tbody>
-            
             {% for file in files %}
             <tr>
                 <td>{{ file.file_name }}</td>
@@ -19,14 +20,39 @@
                     <form method="POST" action="/delete_file">
                         <input type="hidden" name="file_id" value="{{ file.id }}">
                         <button type="submit">Delete</button>
+                    </form>
                 </td>
-                <td><a href="{{ file.path }}">Download</a></td>
+                <td>
+                    <button class="download-button" data-file-path="{{ file.path }}">Download</button>
+                </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
+    
 
-
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var downloadButtons = document.querySelectorAll(".download-button");
+            
+            downloadButtons.forEach(function(button) {
+                button.addEventListener("click", function() {
+                    var filePath = button.getAttribute("data-file-path");
+                    downloadFile(filePath);
+                });
+            });
+    
+            function downloadFile(filePath) {
+                var link = document.createElement('a');
+                link.setAttribute('href', filePath);
+                link.setAttribute('download', '');
+                link.style.display = 'none';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }
+        });
+    </script>
 
 
     {% endblock %}

@@ -5,12 +5,12 @@
     <table>
         <thead>
             <tr>
-                <th>User Id</th>
+                <th>Id</th>
                 <th>Username</th>
-                <th>Password Hash</th>
-                <th>Is Admin</th>
+                <th>Password</th>
+                <th>Admin</th>
                 <th>Files</th>
-                <th>Remove User</th>
+                <th>Delete User</th>
             </tr>
         </thead>
         <tbody>
@@ -24,7 +24,7 @@
                 <td>
                     <form method="POST" action="/files">
                         <input type="hidden" name="user_id" value="{{ user.id }}">
-                        <button type="submit">Delete</button>
+                        <button type="submit">Files</button>
                     </form> <!-- Added closing </form> tag -->
                 </td>
                 <td>

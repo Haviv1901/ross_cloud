@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, jsonify
+from flask import Blueprint, render_template, request, flash, jsonify, url_for
 from flask_login import login_required, current_user
 from flask import redirect
 import os
@@ -6,6 +6,7 @@ from . import db
 from .models import File, User
 from flask import current_app as app
 from werkzeug.utils import secure_filename
+from utilities import *
 views = Blueprint('views', __name__)
 
 
@@ -39,7 +40,7 @@ def upload():
         file.save(os.path.join(user_dir, filename))
         
         # Save file to database
-        file_path = user_dir + '//' + filename
+        file_path = user_dir + '/' + filename
         new_file = File(file_name = filename, path=file_path, user_id=current_user.id)
         db.session.add(new_file)
         db.session.commit()
@@ -80,10 +81,23 @@ def remove_file():
 
 @views.route('/admin')
 @login_required
+@admin_only
 def admin_page():
-    if(current_user.admin == False):
-        flash('You are not an admin', category='error')
-        return render_template("home.html", user=current_user)
+    return render_template("admin.html", users=User.query.all(), files=File.query.all(), user=current_user)
+
+
+
+@views.route('/delete_user', methods=['POST'])
+@login_required
+@admin_only
+def remove_user():
+    user_id = request.form['user_id']
     
-    
-    return render_template("admin.html", user=current_user)
+    if is_user_exist(user_id):
+        delete_user(user_id)
+        flash('User deleted successfully', category='success')
+    else:
+        flash('User not found', category='error')
+    return render_template("admin.html", users=User.query.all(), files=File.query.all(), user=current_user)
+
+    return render_template("admin.html", users=User.query.all(), files=File.query.all(), user=current_user)
